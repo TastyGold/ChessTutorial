@@ -28,18 +28,18 @@ internal class PieceMovementManager
             }
         }
 
+        moveMade = false;
         if (heldPieceId > 0 && Raylib.IsMouseButtonReleased(0))
         {
-            if (mouseOnBoard)
+            if (mouseOnBoard && mouseBoardPosition != heldPieceHideTile)
             {
                 board.SetCell(mouseBoardPosition.x, mouseBoardPosition.y, heldPieceId);
                 board.SetCell(heldPieceHideTile.x, heldPieceHideTile.y, 0);
+                moveMade = true;
             }
             heldPieceHideTile = new VecInt2(-1, -1);
             heldPieceId = 0;
-            moveMade = true;
         }
-        else moveMade = false;
     }
 
     public void Draw(ScreenConfig sc)

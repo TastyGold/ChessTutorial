@@ -21,7 +21,7 @@ internal class Program
     {
         Raylib.InitWindow(sc.screenWidth, sc.screenHeight, "Hello World");
         BoardRenderer.Initialise();
-        mainBoard.SetupBoard("rnbnrnbkqbnrnbnr");
+        mainBoard.SetupBoard("rnbqkbnr");
 
         while (!Raylib.WindowShouldClose())
         {
@@ -32,7 +32,8 @@ internal class Program
             Raylib.ClearBackground(new Color(22, 21, 18, 255));
 
             BoardRenderer.DrawBoardGrid(mainBoard, sc.boardScreenOffsetX, sc.boardScreenOffsetY, sc.boardCellWidth, sc.boardCellHeight);
-            
+            //BoardRenderer.HighlightSquare(pieceMovement.mouseBoardPosition.x, pieceMovement.mouseBoardPosition.y, sc.boardScreenOffsetX, sc.boardScreenOffsetY, sc.boardCellWidth, sc.boardCellHeight, Color.Lime);
+
             BoardRenderer.DrawPieces(mainBoard, sc.boardScreenOffsetX, sc.boardScreenOffsetY, sc.boardCellWidth, sc.boardCellHeight, pieceMovement.heldPieceHideTile);
             pieceMovement.Draw(sc);
 
@@ -40,35 +41,5 @@ internal class Program
         }
 
         Raylib.CloseWindow();
-    }
-}
-
-internal class ScreenConfig
-{
-    public int screenWidth;
-    public int screenHeight;
-    public int boardScreenOffsetX;
-    public int boardScreenOffsetY;
-    public int boardCellWidth;
-    public int boardCellHeight;
-
-    public ScreenConfig(int screenWidth, int screenHeight, int boardScreenOffsetX, int boardScreenOffsetY, int boardCellWidth, int boardCellHeight)
-    {
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
-        this.boardScreenOffsetX = boardScreenOffsetX;
-        this.boardScreenOffsetY = boardScreenOffsetY;
-        this.boardCellWidth = boardCellWidth;
-        this.boardCellHeight = boardCellHeight;
-    }
-
-    public ScreenConfig(int screenWidth, int screenHeight, int boardScreenWidth, int boardScreenHeight, Board board)
-    {
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
-        boardScreenOffsetX = (screenWidth - boardScreenWidth) / 2;
-        boardScreenOffsetY = (screenHeight - boardScreenHeight) / 2;
-        boardCellWidth = boardScreenWidth / board.boardWidth;
-        boardCellHeight = boardScreenHeight / board.boardHeight;
     }
 }
