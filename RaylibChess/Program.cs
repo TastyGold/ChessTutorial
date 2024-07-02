@@ -16,6 +16,13 @@ internal class Program
         );
     public static PieceMovementManager pieceMovement = new();
     public static int playerTurn = 0;
+    public static Camera2D boardCamera = new Camera2D()
+    {
+        Target = new Vector2(sc.screenWidth / 2, sc.screenHeight / 2),
+        Offset = new Vector2(sc.screenWidth / 2, sc.screenHeight / 2),
+        Zoom = 1,
+        Rotation = 180,
+    };
 
     internal static void Main()
     {
@@ -25,18 +32,22 @@ internal class Program
 
         while (!Raylib.WindowShouldClose())
         {
-            pieceMovement.Update(mainBoard, sc, playerTurn, out bool moved);
+            pieceMovement.Update(mainBoard, sc, boardCamera, playerTurn, out bool moved);
             if (moved) playerTurn = playerTurn == 0 ? 1 : 0;
+            boardCamera.Rotation = 180 * playerTurn;
 
             Raylib.BeginDrawing();
+            Raylib.BeginMode2D(boardCamera);
             Raylib.ClearBackground(new Color(22, 21, 18, 255));
 
             BoardRenderer.DrawBoardGrid(mainBoard, sc.boardScreenOffsetX, sc.boardScreenOffsetY, sc.boardCellWidth, sc.boardCellHeight);
             //BoardRenderer.HighlightSquare(pieceMovement.mouseBoardPosition.x, pieceMovement.mouseBoardPosition.y, sc.boardScreenOffsetX, sc.boardScreenOffsetY, sc.boardCellWidth, sc.boardCellHeight, Color.Lime);
+            pieceMovement.HighlightLastMove(sc);
 
-            BoardRenderer.DrawPieces(mainBoard, sc.boardScreenOffsetX, sc.boardScreenOffsetY, sc.boardCellWidth, sc.boardCellHeight, pieceMovement.heldPieceHideTile);
-            pieceMovement.Draw(sc);
+            BoardRenderer.DrawPieces(mainBoard, sc.boardScreenOffsetX, sc.boardScreenOffsetY, sc.boardCellWidth, sc.boardCellHeight, pieceMovement.heldPieceHideTile, boardCamera.Rotation);
+            pieceMovement.Draw(sc, boardCamera.Rotation);
 
+            Raylib.EndMode2D();
             Raylib.EndDrawing();
         }
 

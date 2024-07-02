@@ -10,10 +10,12 @@ internal class PieceMovementManager
     public VecInt2 heldPieceHideTile = new VecInt2(-1, -1);
     public Vector2 heldPiecePosition;
     public VecInt2 mouseBoardPosition;
+    public VecInt2 lastMoveStart = new VecInt2(-1, -1);
+    public VecInt2 lastMoveEnd = new VecInt2(-1, -1);
 
-    public void Update(Board board, ScreenConfig screen, int playerTurn, out bool moveMade)
+    public void Update(Board board, ScreenConfig screen, Camera2D camera, int playerTurn, out bool moveMade)
     {
-        heldPiecePosition = Raylib.GetMousePosition();
+        heldPiecePosition = Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), camera);
         mouseBoardPosition = GetScreenToBoardPosition(screen, heldPiecePosition);
 
         bool mouseOnBoard = IsMouseOnBoard(board, screen, heldPiecePosition);
@@ -35,6 +37,9 @@ internal class PieceMovementManager
             {
                 board.SetCell(mouseBoardPosition.x, mouseBoardPosition.y, heldPieceId);
                 board.SetCell(heldPieceHideTile.x, heldPieceHideTile.y, 0);
+
+                lastMoveStart = heldPieceHideTile;
+                lastMoveEnd = mouseBoardPosition;
                 moveMade = true;
             }
             heldPieceHideTile = new VecInt2(-1, -1);
@@ -42,9 +47,14 @@ internal class PieceMovementManager
         }
     }
 
-    public void Draw(ScreenConfig sc)
+    public void HighlightLastMove(ScreenConfig sc)
     {
-        if (heldPieceId > 0) BoardRenderer.DrawPiece(heldPieceId, heldPiecePosition, new Vector2(sc.boardCellWidth, sc.boardCellHeight));
+        if (lastMoveStart.x != -1) BoardRenderer.HighlightMove(lastMoveStart, lastMoveEnd, sc.boardScreenOffsetX, sc.boardScreenOffsetY, sc.boardCellWidth, sc.boardCellHeight);
+    }
+
+    public void Draw(ScreenConfig sc, float rotation)
+    {
+        if (heldPieceId > 0) BoardRenderer.DrawPiece(heldPieceId, heldPiecePosition, new Vector2(sc.boardCellWidth, sc.boardCellHeight), rotation);
     }
 
     public static VecInt2 GetScreenToBoardPosition(ScreenConfig screen, Vector2 mousePos)

@@ -6,8 +6,10 @@ namespace HelloWorld;
 
 internal static class BoardRenderer
 {
-    public static Color gridColorA = new Color(181, 136, 99, 255);
-    public static Color gridColorB = new Color(240, 217, 181, 255);
+    public static readonly Color gridColorA = new(181, 136, 99, 255);
+    public static readonly Color gridColorB = new(240, 217, 181, 255);
+    public static readonly Color lastMoveA = new(171, 162, 58, 255);
+    public static readonly Color lastMoveB = new(206, 210, 107, 255);
 
     public static Texture2D pieces;
     public static float pieceTexWidth;
@@ -37,7 +39,13 @@ internal static class BoardRenderer
         Raylib.DrawRectangle(screenX + (x * cellWidth), screenY + (y * cellHeight), cellWidth, cellHeight, col);
     }
 
-    public static void DrawPieces(Board board, int screenX, int screenY, int cellWidth, int cellHeight, VecInt2 hideTile)
+    public static void HighlightMove(VecInt2 start, VecInt2 end, int screenX, int screenY, int cellWidth, int cellHeight)
+    {
+        HighlightSquare(start.x, start.y, screenX, screenY, cellWidth, cellHeight, (start.x + start.y) % 2 == 1 ? lastMoveA : lastMoveB);
+        HighlightSquare(end.x, end.y, screenX, screenY, cellWidth, cellHeight, (end.x + end.y) % 2 == 1 ? lastMoveA : lastMoveB);
+    }
+
+    public static void DrawPieces(Board board, int screenX, int screenY, int cellWidth, int cellHeight, VecInt2 hideTile, float rotation)
     {
         for (int y = 0; y < board.boardHeight; y++)
         {
@@ -45,25 +53,23 @@ internal static class BoardRenderer
             {
                 if (board.GetCell(x, y) == 0 || hideTile.x == x && hideTile.y == y) continue;
 
-                DrawPiece(board.GetCell(x, y), screenX + cellWidth * x, screenY + cellHeight * y, cellWidth, cellHeight);
+                DrawPiece(board.GetCell(x, y), screenX + cellWidth * x, screenY + cellHeight * y, cellWidth, cellHeight, rotation);
             }
         }
-
-        Rectangle sourceRectangle = new Rectangle(100, 0, 100, 100);
     }
 
-    public static void DrawPiece(int piece, int screenX, int screenY, int cellWidth, int cellHeight)
+    public static void DrawPiece(int piece, int screenX, int screenY, int cellWidth, int cellHeight, float rotation)
     {
         Rectangle srec = GetPiecesSrec(piece);
-        Rectangle drec = new Rectangle(screenX, screenY, cellWidth, cellHeight);
-        Raylib.DrawTexturePro(pieces, srec, drec, Vector2.Zero, 0, Color.White);
+        Rectangle drec = new(screenX + cellWidth / 2, screenY + cellHeight / 2, cellWidth, cellHeight);
+        Raylib.DrawTexturePro(pieces, srec, drec, new Vector2(cellWidth / 2f, cellHeight / 2f), rotation, Color.White);
     }
 
-    public static void DrawPiece(int piece, Vector2 center, Vector2 size)
+    public static void DrawPiece(int piece, Vector2 center, Vector2 size, float rotation)
     {
         Rectangle srec = GetPiecesSrec(piece);
-        Rectangle drec = new Rectangle(center - (size / 2), size);
-        Raylib.DrawTexturePro(pieces, srec, drec, Vector2.Zero, 0, Color.White);
+        Rectangle drec = new(center, size);
+        Raylib.DrawTexturePro(pieces, srec, drec, size / 2f, rotation, Color.White);
     }
 
     public static Rectangle GetPiecesSrec(int piece)
